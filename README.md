@@ -1,74 +1,79 @@
-This repository contains an empty project (fastapi) of a webapp where the goal is to extend the application.
+This repository contains a minimal FastAPI project. Your task is to extend the application by adding the features described below.
 
 ---
 
 ## 1. Quick-start
 
 ```bash
-pip3 install uvicorn
-pip3 install -e .
+pip install uvicorn
+pip install -e .
 
 uvicorn qhapp.main:app --reload
 ```
 
-## goals:
 
-1) add an endpoint that implements getting datasets, a dataset contains several fields:
-	* name
-	* attributes e.g. {'users' : ["user_1", "user_2"] , "set_up" = ["set_up_1"], ... }
-	* files (e.g. [file_1, file_2]). The file has a name, and storage location.
+## 2. Goals
 
-Is should be possible to retrieve the dataset object, along with/witout the files.
+### 2.1 Datasets endpoint
 
-2) add an enpoint that allows you te retrieve attributes, based on a set of given attibutes, example:
+Create an endpoint that returns datasets.  
+Each dataset must contain:
 
-Say there are three datasets with the following attibutes
+* `name`
+* `attributes` – which can map, for example  
+  `{"users": ["user_1", "user_2"], "set_up": ["set_up_1"], ...}`
+* `files` – a list of files, each with a `name` and a `storage_location`
 
-ds1 :
+The client should be able to request the dataset either **with** or **without** the `files` field.
 
-| attr key | attr value |
--------------------------
-| users    | user_1     |
-| users    | user_2     |
-| set_up   | XLD        |
-| project  | 2qubits    |
+### 2.2 Attribute-filtering endpoint
 
-ds2 :
+Implement an endpoint that, given a set of attribute filters, returns all matching attribute key–value pairs across datasets.
 
-| attr key | attr value |
--------------------------
-| users    | user_3     |
-| set_up   | XLD        |
-| project  | qubit_read |
+Example datasets:
 
+**ds1**
 
-ds2 :
+| Key | Value |
+| --- | ----- |
+| users | user_1 |
+| users | user_2 |
+| set_up | XLD |
+| project | 2qubits |
 
-| attr key | attr value |
--------------------------
-| users    | user_2     |
-| set_up   | VTT        |
+**ds2**
 
-In this example:
+| Key | Value |
+| --- | ----- |
+| users | user_3 |
+| set_up | XLD |
+| project | qubit_read |
 
-When the users : user_2 is provided, the server should return all attributes that occur in common:
+**ds3**
 
-So in this example that would return:
+| Key | Value |
+| --- | ----- |
+| users | user_2 |
+| set_up | VTT |
 
-| attr key | attr value |
--------------------------
-| set_up   | XLD        |
-| set_up   | VTT        |
-| project  | 2qubits    |
+If the client supplies the filter `users=[user_2]`, the server should return every key–value pair present in the selected datasets:
 
-It should also be possible to make multiple selections, e.g. users : user_1 and user_2 + project : 2qubits
+| Key | Value |
+| --- | ----- |
+| set_up | XLD |
+| set_up | VTT |
+| project | 2qubits |
 
-In this case it returns
+Multiple filters can be combined.  
+For instance, `users=[user_1,user_2]`, and `project=[2qubits]` should yield (only one option in this example):
 
-| attr key | attr value |
--------------------------
-| project  | 2qubits    |
+| Key | Value |
+| --- | ----- |
+| project | 2qubits |
 
-Bonusses ::
-** add unit testing
-** extensive error handling
+---
+
+## 3. Bonus
+
+* Add unit tests
+* Implement error handling
