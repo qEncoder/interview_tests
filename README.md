@@ -5,12 +5,21 @@ This repository contains a minimal FastAPI project. Your task is to extend the a
 ## 1. Quick-start
 
 ```bash
+# Install the ASGI server
 pip install uvicorn
+
+# Install this project in editable mode (so code changes are picked up automatically)
 pip install -e .
 
+# Start the application with hot-reload enabled
 uvicorn qhapp.main:app --reload
 ```
 
+Unit tests can be run with:
+
+```bash
+pytest
+```
 
 ## 2. Goals
 
