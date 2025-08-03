@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qhapp"
+description = ""
+requires-python = ">=3.9"
+dynamic = ["version"]
+
+dependencies = [
+    "fastapi[standard]>=0.115.5",
+    "pydantic>=2.4.2",
+    "sqlalchemy[asyncio]>=2.0.36",
+    "aiosqlite>=0.20.0"
+]
+
+[tool.setuptools]
+packages = ["qhapp"]
+
+[tool.setuptools.dynamic]
+version = {attr = "qhapp.__version__"}
