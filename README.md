@@ -26,59 +26,100 @@ pytest
 ### 2.1 Datasets endpoint
 
 Create an endpoint that returns datasets.  
-Each dataset must contain:
 
-* `name`
-* `attributes` – which can map, for example  
-  `{"users": ["user_1", "user_2"], "set_up": ["set_up_1"], ...}`
-* `files` – a list of files, each with a `name` and a `storage_location`
+A returned dataset (JSON) object should have a structure that resembles the following:
+```json
+{
+  "name": "my_dataset_name",
+  "attributes": {
+    "users": ["user_1", "user_2"], 
+    "set_up": ["set_up_1"]
+  },
+  "files": [
+    {
+      "name": "test.py", 
+      "status": "uploaded"
+    }, 
+    {
+      "name": "test.hdf5", 
+      "status": "in_progress"
+    }
+  ]
+}
+```
 
 The client should be able to request the dataset either **with** or **without** the `files` field.
 
+**Note**: Attribute key-value pairs are frequently shared across multiple datasets (e.g., the same `users` or `set_up` values appear in different datasets). Also consider that it should be possible to perform the filtering operations explained in the next section.
+
 ### 2.2 Attribute-filtering endpoint
 
-Implement an endpoint that, given a set of attribute filters, returns all matching attribute key–value pairs across datasets.
+This endpoint accepts attribute filters and returns all attribute key-value pairs that co-occur with the filtered datasets.
+
+**How it works:**
+
+1. *Input*: A set of attribute filters (e.g., `{"key_a": ["value1", "value7"], "key_b": ["value8"]}`)
+2. *Process*: Find all datasets that match ALL specified filters:
+   - Have `key_a` with value `"value1"` OR `"value7"` AND
+   - Have `key_b` with value `"value8"`
+3. *Output*: Return all attribute key-value pairs present in the matching datasets, excluding the filter attributes (e.g., if filtering by `users` and `project`, return all other attributes like `set_up`, `environment`, etc.)
+
 
 Example datasets:
 
-**ds1**
+```json
+// ds1
+{
+  "name": "ds1",
+  "attributes": {
+    "users": ["user_1", "user_2"],
+    "set_up": ["XLD"],
+    "project": ["2qubits"]
+  },
+  "files": []
+}
 
-| Key | Value |
-| --- | ----- |
-| users | user_1 |
-| users | user_2 |
-| set_up | XLD |
-| project | 2qubits |
+// ds2
+{
+  "name": "ds2", 
+  "attributes": {
+    "users": ["user_3"],
+    "set_up": ["XLD"],
+    "project": ["qubit_read"]
+  },
+  "files": []
+}
 
-**ds2**
+// ds3
+{
+  "name": "ds3",
+  "attributes": {
+    "users": ["user_2"],
+    "set_up": ["VTT"]
+  },
+  "files": []
+}
+```
 
-| Key | Value |
-| --- | ----- |
-| users | user_3 |
-| set_up | XLD |
-| project | qubit_read |
+If the client supplies the filter `users=["user_2"]`, the server should return every key–value pair present in the selected datasets:
 
-**ds3**
-
-| Key | Value |
-| --- | ----- |
-| users | user_2 |
-| set_up | VTT |
-
-If the client supplies the filter `users=[user_2]`, the server should return every key–value pair present in the selected datasets:
-
-| Key | Value |
-| --- | ----- |
-| set_up | XLD |
-| set_up | VTT |
-| project | 2qubits |
+```json
+{
+  "set_up": ["XLD", "VTT"],
+  "project": ["2qubits"]
+}
+```
 
 Multiple filters can be combined.  
-For instance, `users=[user_1,user_2]`, and `project=[2qubits]` should yield (only one option in this example):
+For instance, `users=["user_1","user_2"]` and `project=["2qubits"]` should:
+1. Find datasets matching BOTH filters (only **ds1** matches)
+2. Return all other attributes from **ds1** (excluding the filter attributes):
 
-| Key | Value |
-| --- | ----- |
-| project | 2qubits |
+```json
+{
+  "set_up": ["XLD"]
+}
+```
 
 ---
 
