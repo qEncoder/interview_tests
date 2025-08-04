@@ -32,8 +32,8 @@ A returned dataset (JSON) object should have a structure that resembles the foll
 {
   "name": "my_dataset_name",
   "attributes": {
-    "users": ["user_1", "user_2"], 
-    "set_up": ["set_up_1"]
+    "key1": ["value_1", "value_2"], 
+    "key2": ["value_3"]
   },
   "files": [
     {
